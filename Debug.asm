@@ -1,7 +1,8 @@
 ;
-; Debug stuff
+; Debug features
 ; by elusive
 ; Warp to previous level with L and next level with R
+; Statusbar features require Super Status Bar patch (https://www.smwcentral.net/?p=section&a=details&id=19247)
 ;
 
 
@@ -25,16 +26,48 @@ endmacro
 !RAM_CurrentLevelNum = $010B|!addr
 !RAM_SoundEffect = $1DFC|!addr
 
-; SCRATCH
-!SCRATCH_ExitTable1 = $7FA260
-!SCRATCH_ExitTable2 = $7FA261
+; Statusbar RAM
+
+!ShowRoomInStatusbar = 1
+!RAM_RoomStart      = $7FA000
+!RAM_RoomBit100     = !RAM_RoomStart
+!RAM_RoomBit010     = !RAM_RoomStart+2
+!RAM_RoomBit001     = !RAM_RoomStart+4
 
 
+
+init:
+
+if !ShowRoomInStatusbar
+    REP #$20                    ; 16 bit A
+    LDA.w !RAM_CurrentLevelNum  ; current level
+    STA $00                     ; store in $00-$01
+    SEP #$20                    ; 8 bit A
+
+    LDA $01
+    AND #$01
+    STA !RAM_RoomBit100
+    LDA #$38
+    STA !RAM_RoomBit100+1
+
+    LDA $00
+    AND #$F0
+    LSR #4
+    STA !RAM_RoomBit010
+    LDA #$38
+    STA !RAM_RoomBit010+1
+
+    LDA $00
+    AND #$0F
+    STA !RAM_RoomBit001
+    LDA #$38
+    STA !RAM_RoomBit001+1
+endif
+    RTL
 
 main:
 
-
-; check for button presses
+    ; check for button presses
     LDA.b $18                   ; axlr---- pressed on this frame
     BIT #$20                    ; 001000000 (L) pressed on this frame
     BNE .prev
@@ -104,4 +137,3 @@ endif
 
 Return:
     RTL
-
