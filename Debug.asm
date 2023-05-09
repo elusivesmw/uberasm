@@ -33,7 +33,6 @@ endmacro
 !RAM_WarpLevelTimer     = !FreeRAM+2
 
 ; Statusbar RAM
-
 !ShowRoomInStatusbar    = 1
 !RAM_RoomStart          = $7FA000
 !RAM_RoomBit100         = !RAM_RoomStart
@@ -41,9 +40,7 @@ endmacro
 !RAM_RoomBit001         = !RAM_RoomStart+4
 
 
-
 init:
-
     LDA #$00                    ; clear warp timer
     STA !RAM_WarpLevelTimer
 
@@ -54,9 +51,8 @@ init:
 
     JMP DrawHud                 ; draw hud
 
-main:
 
-    
+main:
     LDA !RAM_WarpLevelTimer     ; if timer != 0
     BNE .input                  ; else timer-- and check for input
 
@@ -67,7 +63,6 @@ main:
     JMP Warp                    ; warp
 
 .input
-    
     DEC                         ; timer--
     STA !RAM_WarpLevelTimer
 
@@ -81,8 +76,6 @@ main:
     BNE .next
 
     JMP Return                  ; no press, return
-
-
 
 .prev
     REP #$20                    ; 16 bit A
@@ -124,7 +117,6 @@ main:
     
     JMP DrawHud                 ; draw hu
 
-
 Warp:
 if !EXLEVEL
     JSL $03BCDC|!bank           ;> get screen number from LM hijack, and put in X
@@ -136,11 +128,11 @@ else
     LDA $95,x                   ;|
     TAX                         ;/
 endif
-    
+
     LDA !RAM_WarpLevelNum       ;\ 
     STA $19B8|!addr,x           ;| restore level from free RAM into current screen exit
-    ORA #$04                    ;| set level table flag w bit HHHHwush
     LDA !RAM_WarpLevelNum+1     ;|
+    ORA #$04                    ;| set level table flag w bit HHHHwush
     STA $19D8|!addr,x           ;/
     
     LDA #$06                    ;\
@@ -148,7 +140,6 @@ endif
     STZ $88                     ;|
     STZ $89                     ;/
     JMP Return
-
 
 DrawHud:
 if !ShowRoomInStatusbar
