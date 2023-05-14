@@ -6,10 +6,10 @@
 
 ; Settings
 !EXLEVEL            = 1         ; 1 = for LM versions > 2.57, 0 for older LM versions
-!Mode               = 0         ; 0 = warp, 1 = hurt, 2+ = kill
-!WarpLevelFlag1     = $2C       ; level exit flags 1
+!Mode               = 2         ; 0 = warp, 1 = hurt, 2+ = kill
+!WarpLevelFlag1     = $20       ; level exit flags 1
 !WarpLevelFlag2     = $04       ; level exit flags 2
-!TimeTilDoMode      = $08       ; time in frames til warp, hurt, or kill ($79 frames or less, $00-$10 recommended)
+!TimeTilDoMode      = $08      ; time in frames til warp, hurt, or kill ($79 frames or less, $00-$10 recommended)
 !UseBlacklist       = 1         ; 0 = no, 1 = yes (recommended)
 
 ; FreeRAM addresses
@@ -40,10 +40,7 @@ db $2D, $0D
 
 
 init: 
-    LDA #$FF
-    STA !RAM_LastHeldSpriteIndex
-    STA !RAM_HasBeenKicked
-    STA !RAM_DelayTimer
+    JSR Reset
 
 main: 
 
@@ -99,7 +96,7 @@ main:
 
     LDA !RAM_SpriteYSpeed,x             ; if not moving Y, don't kill
     SEC : SBC #$20
-    BMI .reset
+    BMI .return
 
 
     ; activate warp, hurt, or kill
@@ -112,16 +109,10 @@ main:
         JMP DoMode
     endif
 
-
     .despawn
-    LDA !RAM_SpriteStatus,x
+    LDA !RAM_SpriteStatus,x             ; did kicked sprite despawn?
     BNE .return
-
-    .reset
-    LDA #$FF
-    STA !RAM_LastHeldSpriteIndex 
-    ;STA !RAM_DelayTimer
-    STA !RAM_HasBeenKicked
+    JSR Reset
 
     .return
     RTL
@@ -162,8 +153,17 @@ Blacklist:
     PLX                                 ; valid X, don't clear
     RTS                                 ; return
 
-DoMode:
+Reset:
+    LDA #$FF
+    STA !RAM_LastHeldSpriteIndex 
+    STA !RAM_HasBeenKicked
+    if !TimeTilDoMode > 0
+        STA !RAM_DelayTimer
+    endif
+    RTS
 
+DoMode:
+    JSR Reset
     if !Mode == 0
         ; warp to level
         JSR Warp
