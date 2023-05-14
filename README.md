@@ -1,19 +1,23 @@
 # uberasm
 
-- Debug - Warps the player to the previous or next level number using L/R. Useful for rapidly changing to nearby levels.
+## Debug
+
+Warps the player to the previous or next level number using L/R. Useful for rapidly changing to nearby levels to test.
 
 ![](/docs/debug.gif)
 
-- NoShellJump - Warps, hurts, or kills the player if they shell jump
+## NoShellJump
 
-Warp
+Warps, hurts, or kills the player if they shell jump.
+
+### Warp
 
 ![](/docs/nosj_warp.gif)
 
-Hurt
+### Hurt
 
 ![](/docs/nosj_hurt.gif)
 
-Kill
+### Kill
 
 ![](/docs/nosj_kill.gif)
